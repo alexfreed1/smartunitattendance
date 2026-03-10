@@ -1,0 +1,39 @@
+{
+    "name": "suas/smart-unit-attendance-system",
+    "description": "Smart Unit Attendance System - A modern, multi-institution attendance management system",
+    "type": "project",
+    "keywords": ["attendance", "education", "multi-tenant", "php"],
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.0",
+        "ext-pdo": "*",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "ext-session": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0",
+        "squizlabs/php_codesniffer": "^3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "SUAS\\": "src/"
+        },
+        "files": [
+            "config.php",
+            "config_master.php"
+        ]
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "phpcs --standard=PSR12 .",
+        "lint-fix": "phpcbf --standard=PSR12 ."
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

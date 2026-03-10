@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  suas-app:
+    build: .
+    ports:
+      - "8000:80"
+    environment:
+      # Supabase Configuration
+      - USE_SUPABASE=true
+      - SUPABASE_DB_HOST=db.lpxyqipihklpaxxfourw.supabase.co
+      - SUPABASE_DB_PORT=5432
+      - SUPABASE_DB_USER=postgres
+      - SUPABASE_DB_PASS=HqcUpqT8IV6FGkve
+      - SUPABASE_MASTER_DB_NAME=postgres
+      
+      # Application Settings
+      - APP_ENV=production
+      - APP_URL=http://localhost:8000
+      - DEBUG=true
+    volumes:
+      # Mount your code for live development
+      - ./:/var/www/html
+      # Storage directories
+      - ./storage:/var/www/html/storage
+    restart: unless-stopped

@@ -1,0 +1,109 @@
+services:
+  # SUAS Web Application Service
+  - type: web
+    name: suas-app
+    env: php
+    region: oregon
+    plan: starter
+    branch: main
+    buildCommand: |
+      # Install any additional PHP extensions if needed
+      echo "Installing dependencies..."
+      
+      # Create necessary directories
+      mkdir -p storage/logs
+      mkdir -p storage/sessions
+      mkdir -p storage/cache
+      chmod -R 777 storage/
+      
+      # Install composer dependencies if you have composer.json
+      if [ -f composer.json ]; then
+        composer install --no-dev --optimize-autoloader
+      fi
+      
+      echo "Build completed!"
+    
+    startCommand: |
+      # Start PHP built-in server with proper configuration
+      echo "Starting SUAS application..."
+      
+      # Set PHP runtime configuration
+      export PHP_INI_SCAN_DIR=/etc/php
+      
+      # Start the PHP built-in server
+      exec php -S 0.0.0.0:$PORT -t public
+      
+    envVars:
+      # Database Configuration (Supabase)
+      - key: USE_SUPABASE
+        value: true
+      - key: SUPABASE_DB_HOST
+        sync: false
+      - key: SUPABASE_DB_PORT
+        value: 5432
+      - key: SUPABASE_DB_USER
+        value: postgres
+      - key: SUPABASE_DB_PASS
+        sync: false
+      - key: SUPABASE_MASTER_DB_NAME
+        value: postgres
+      
+      # Alternative: DATABASE_URL connection string
+      - key: DATABASE_URL
+        sync: false
+      
+      # Application Settings
+      - key: APP_ENV
+        value: production
+      - key: APP_URL
+        sync: false
+      - key: DEBUG
+        value: false
+      - key: SESSION_SECURE
+        value: true
+      
+      # Security
+      - key: APP_KEY
+        generateValue: true
+      - key: CSRF_ENABLED
+        value: true
+      
+      # PHP Settings
+      - key: PHP_MEMORY_LIMIT
+        value: 256M
+      - key: PHP_UPLOAD_MAX_FILESIZE
+        value: 10M
+      
+    healthCheckPath: /index.php
+    disk:
+      name: storage
+      mountPath: /opt/render/project/src/storage
+      sizeGB: 1
+
+  # Optional: Background worker for scheduled tasks
+  - type: worker
+    name: suas-worker
+    env: php
+    region: oregon
+    plan: starter
+    branch: main
+    buildCommand: |
+      echo "Building worker..."
+      mkdir -p storage/logs
+      chmod -R 777 storage/
+    
+    startCommand: |
+      echo "Worker started. Note: PHP workers need a queue runner script."
+      # Add your queue/job runner here if needed
+      # For now, just keep the worker alive
+      while true; do
+        sleep 3600
+      done
+    
+    envVars:
+      - key: USE_SUPABASE
+        value: true
+      - key: SUPABASE_DB_HOST
+        sync: false
+      - key: SUPABASE_DB_PASS
+        sync: false
